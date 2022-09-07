@@ -16,8 +16,30 @@ mongoClient.connect().then(() => {
   db = mongoClient.db("mywallet");
 });
 
+const userDataSchema = joi.object({
+  name: joi.string().alphanum().trim().required(),
+  email: joi.string().email().required(),
+  password: joi.string().required(),
+  passwordConfirm: joi.ref("password"),
+});
+
 server.post("/sign-up", async (req, res) => {
   try {
+    const validation = userDataSchema.validate(req.body, { abortEarly: false });
+    const [sameEmail] = await db
+      .collection("users")
+      .find({ email: req.body.email })
+      .toArray();
+
+    if (sameEmail) {
+      res.status(409).send("Email already in use");
+      return;
+    }
+    if (validation.error) {
+      const errors = validation.error.details.map((error) => error.message);
+      res.status(422).send(errors);
+      return;
+    }
     await db.collection("users").insertOne({
       name: req.body.name,
       email: req.body.email,
