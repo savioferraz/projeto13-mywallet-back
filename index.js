@@ -1,8 +1,9 @@
-import { MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ServerDescription } from "mongodb";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import joi from "joi";
+import dayjs from "dayjs";
 
 dotenv.config();
 
@@ -44,6 +45,36 @@ server.post("/sign-up", async (req, res) => {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
+    });
+    res.sendStatus(201);
+  } catch (error) {
+    res.sendStatus(400);
+  }
+});
+
+server.post("/incomes", async (req, res) => {
+  try {
+    await db.collection("transactions").insertOne({
+      email: req.body.email,
+      type: "income",
+      amount: req.body.amount,
+      desc: req.body.desc,
+      date: dayjs().format("DD/MM"),
+    });
+    res.sendStatus(201);
+  } catch (error) {
+    res.sendStatus(400);
+  }
+});
+
+server.post("/expenses", async (req, res) => {
+  try {
+    await db.collection("transactions").insertOne({
+      email: req.body.email,
+      type: "expense",
+      amount: req.body.amout,
+      desc: req.body.desc,
+      date: dayjs().format("DD/MM"),
     });
     res.sendStatus(201);
   } catch (error) {
