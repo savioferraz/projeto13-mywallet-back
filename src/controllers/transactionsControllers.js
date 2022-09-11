@@ -3,6 +3,15 @@ import mongo from "../db/db.js";
 
 let db = await mongo();
 
+const transactions = async (req, res) => {
+  try {
+    await db.collection("transactions").find({ email: req.body.email });
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(400);
+  }
+};
+
 const income = async (req, res) => {
   try {
     await db.collection("transactions").insertOne({
@@ -23,7 +32,7 @@ const expense = async (req, res) => {
     await db.collection("transactions").insertOne({
       email: req.body.email,
       type: "expense",
-      amount: req.body.amout,
+      amount: req.body.amount * -1,
       desc: req.body.desc,
       date: dayjs().format("DD/MM"),
     });
@@ -33,4 +42,4 @@ const expense = async (req, res) => {
   }
 };
 
-export { income, expense };
+export { income, expense, transactions };

@@ -1,9 +1,10 @@
 import express from "express";
-import * as transactionsRouters from "../controllers/transactionsControllers.js";
+import * as transactionsControllers from "../controllers/transactionsControllers.js";
 
 const router = express.Router();
 
-router.post("/transactions", transactionsRouters.income);
-router.post("/transactions", transactionsRouters.expense);
+router.get("/transactions", transactionsControllers.transactions);
+router.post("/transactions", transactionsControllers.income);
+router.post("/transactions", transactionsControllers.expense);
 
 export default router;

@@ -1,4 +1,8 @@
+import bcrypt from "bcrypt";
 import joi from "joi";
+import mongo from "../db/db.js";
+
+let db = await mongo();
 
 const userDataSchema = joi.object({
   name: joi.string().alphanum().trim().required(),
@@ -24,8 +28,22 @@ async function signUpMiddleware(req, res, next) {
     res.status(422).send(errors);
     return;
   }
+
   res.locals.userData = userData;
   next();
 }
 
-export { signUpMiddleware };
+async function loginMiddleware(req, res, next) {
+  const loginData = req.body;
+  const user = await db.collection("users").findOne({ email: loginData.email });
+
+  if (user && bcrypt.compareSync(loginData.password, user.password)) {
+    res.locals.loginData = loginData;
+    next();
+  } else {
+    res.status(409).send("Invalid email or password");
+    return;
+  }
+}
+
+export { signUpMiddleware, loginMiddleware };
