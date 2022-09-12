@@ -12,8 +12,6 @@ const userDataSchema = joi.object({
 });
 
 async function signUpMiddleware(req, res, next) {
-  const userData = req.body;
-  const validation = userDataSchema.validate(userData, { abortEarly: false });
   const [sameEmail] = await db
     .collection("users")
     .find({ email: userData.email })
@@ -23,6 +21,9 @@ async function signUpMiddleware(req, res, next) {
     res.status(409).send("Email already in use");
     return;
   }
+  const userData = req.body;
+  const validation = userDataSchema.validate(req.body, { abortEarly: false });
+
   if (validation.error) {
     const errors = validation.error.details.map((error) => error.message);
     res.status(422).send(errors);
@@ -34,11 +35,10 @@ async function signUpMiddleware(req, res, next) {
 }
 
 async function loginMiddleware(req, res, next) {
-  const loginData = req.body;
-  const user = await db.collection("users").findOne({ email: loginData.email });
+  const user = await db.collection("users").findOne({ email: req.body.email });
+  const passDecrypt = bcrypt.compareSync(req.body.password, user.password);
 
-  if (user && bcrypt.compareSync(loginData.password, user.password)) {
-    res.locals.loginData = loginData;
+  if (user && passDecrypt) {
     next();
   } else {
     res.status(409).send("Invalid email or password");
