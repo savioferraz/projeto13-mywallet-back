@@ -46,4 +46,28 @@ async function loginMiddleware(req, res, next) {
   }
 }
 
-export { signUpMiddleware, loginMiddleware };
+async function getUserMiddleware(req, res, next) {
+  const { authorization } = req.headers;
+  const token = authorization?.replace("Bearer ", "");
+
+  if (!token) {
+    res.status(401).send("token error");
+    return;
+  }
+
+  const session = await db.collection("sessions").findOne({ token });
+  if (!session) {
+    res.status(401).send("seassion error");
+    return;
+  }
+
+  const user = await db.collection("users").findOne({ email: session.email });
+  if (user) {
+    res.locals.user = user;
+    next();
+  } else {
+    res.status(401).send("user error");
+  }
+}
+
+export { signUpMiddleware, loginMiddleware, getUserMiddleware };

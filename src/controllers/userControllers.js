@@ -34,4 +34,17 @@ const login = async (req, res) => {
   }
 };
 
-export { signUp, login };
+const getUser = async (req, res) => {
+  try {
+    const user = res.locals.user;
+    const userName = await db
+      .collection("users")
+      .find({ email: user.email })
+      .toArray();
+    res.status(200).send(userName);
+  } catch (error) {
+    res.sendStatus(400);
+  }
+};
+
+export { signUp, login, getUser };

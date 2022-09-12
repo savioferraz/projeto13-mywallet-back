@@ -5,7 +5,7 @@ let db = await mongo();
 
 const transactionSchema = joi.object({
   amount: joi.number().integer().required(),
-  desc: joi.string().alphanum().required(),
+  desc: joi.string().required(),
 });
 
 async function getTransactionsMiddleware(req, res, next) {
