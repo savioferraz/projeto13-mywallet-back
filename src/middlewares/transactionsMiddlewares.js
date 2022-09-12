@@ -13,13 +13,13 @@ async function getTransactionsMiddleware(req, res, next) {
   const token = authorization?.replace("Bearer ", "");
 
   if (!token) {
-    res.status(401).send("token error");
+    res.sendStatus(401);
     return;
   }
 
   const session = await db.collection("sessions").findOne({ token });
   if (!session) {
-    res.status(401).send("seassion error");
+    res.sendStatus(401);
     return;
   }
 
@@ -28,7 +28,7 @@ async function getTransactionsMiddleware(req, res, next) {
     res.locals.user = user;
     next();
   } else {
-    res.status(401).send("user error");
+    res.sendStatus(401);
   }
 }
 

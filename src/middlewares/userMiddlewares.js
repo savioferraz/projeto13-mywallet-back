@@ -12,6 +12,8 @@ const userDataSchema = joi.object({
 });
 
 async function signUpMiddleware(req, res, next) {
+  const userData = req.body;
+
   const [sameEmail] = await db
     .collection("users")
     .find({ email: userData.email })
@@ -21,7 +23,7 @@ async function signUpMiddleware(req, res, next) {
     res.status(409).send("Email already in use");
     return;
   }
-  const userData = req.body;
+
   const validation = userDataSchema.validate(req.body, { abortEarly: false });
 
   if (validation.error) {
