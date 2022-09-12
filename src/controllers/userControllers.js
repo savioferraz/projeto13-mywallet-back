@@ -7,6 +7,7 @@ let db = await mongo();
 const signUp = async (req, res) => {
   const passwordHash = bcrypt.hashSync(req.body.password, 10);
   console.log(passwordHash);
+  const token = uuid();
 
   try {
     await db.collection("users").insertOne({
@@ -14,7 +15,7 @@ const signUp = async (req, res) => {
       email: req.body.email,
       password: passwordHash,
     });
-    res.sendStatus(201);
+    res.status(200).send(token);
   } catch (error) {
     res.sendStatus(400);
   }
