@@ -13,13 +13,14 @@ async function getTransactionsMiddleware(req, res, next) {
   const token = authorization?.replace("Bearer ", "");
 
   if (!token) {
-    res.sendStatus(401);
+    res.status(401).send("token error");
     return;
   }
 
-  const session = await db.collection("sessions").findOne({ token });
+  console.log(token);
+  const session = await db.collection("sessions").findOne({ token: token });
   if (!session) {
-    res.sendStatus(401);
+    res.status(401).send("seassion error");
     return;
   }
 
